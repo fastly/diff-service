@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "child-process-promise": "^2.2.1",
+    "diff": "^3.2.0",
+    "mkdirp-promise": "^5.0.1",
+    "node-fetch": "^1.6.3",
+    "valid-url": "^1.0.9"
+  },
+  "devDependencies": {
+    "express": "^4.15.2"
+  }
+}
