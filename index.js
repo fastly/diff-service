@@ -63,34 +63,6 @@ exports.compareURLs = function compareURLs (req, res) {
 
           return new Promise(resolve => resp.body.on('finish', resolve.bind(null, meta)));
         })
-
-/*
-        // Determine what the file type is
-        .then(meta => {
-          console.log("Reading file type of " + meta.path);
-          return exec('file -b --mime ' + meta.path)
-            .then(result => {
-              meta.type = result.stdout.replace(/\s*;[\s\S]*$/, '');
-              console.log("File type of " + meta.path + ' is ' + meta.type);
-              return meta;
-            })
-          ;
-        })
-
-        // If the file is compressed, unzip it
-        .then(meta => {
-          if (meta.type === 'application/x-gzip') {
-            console.log('Unzipping compressed file ' + meta.path);
-            return exec('gzip --decompress --verbose ' + meta.path).then(result => {
-              meta.path = result.stderr.replace(/^[\s\S]*replaced with\s+(.+)\s*$/, '$1');
-              return meta;
-            });
-          } else {
-            return meta;
-          }
-        })
-*/
-
       ;
     })))
 
