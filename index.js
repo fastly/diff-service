@@ -1,12 +1,15 @@
 const url = require('url');
 const zlib = require('zlib');
+const fs = require('fs');
+const path = require('path');
 
 const isValidURL = require('valid-url').isUri;
 const fetch = require('node-fetch');
-const bsdiff = require('node-bsdiff').diff;
+const exec = require('child-process-promise').exec;
 
 const DEFAULT_TTL = 3600;
-const MAX_SOURCE_SIZE = 10 * 1024 * 1024;
+const MAX_SOURCE_SIZE = 100 * 1024 * 1024;
+const TMP_FS_PATH = "/tmp";
 
 exports.compareURLs = function compareURLs (req, res) {
 
@@ -46,14 +49,8 @@ exports.compareURLs = function compareURLs (req, res) {
 
             meta.surrogateKey = resp.headers.get('surrogate-key') || null;
 
-            const bufs = [];
-            respStream.on('data', data => bufs.push(data));
-            return new Promise(resolve => {
-              respStream.on('finish', () => {
-                meta.content = Buffer.concat(bufs);
-                resolve(meta);
-              });
-            });
+            respStream.pipe(fs.createWriteStream(path.join(TMP_FS_PATH, param)));
+            return new Promise(resolve => respStream.on('finish', resolve.bind(null, meta)));
           })
         ;
       }))
@@ -61,16 +58,21 @@ exports.compareURLs = function compareURLs (req, res) {
 
     // Create patch and serve it
     .then(([from, to]) => {
-      console.log('Computing patch of ' + from.name + ' (' + from.content.length + ') and ' + to.name + ' (' + to.content.length + ')');
-      const patch = bsdiff(from.content, to.content);
-      res.status(200);
-      res.set('Cache-Control', 'max-age=' + Math.min(from.ttl, to.ttl));
-      res.set('Content-Type', 'application/octet-stream');
-      if (from.surrogateKey || to.surrogateKey) {
-        res.set('Surrogate-Key', from.surrogateKey + ' ' + to.surrogateKey);
-      }
-      console.log("Sending patch file (" + patch.length + ")...");
-      res.send(patch);
+      console.log('Computing patch of ' + from.name + ' and ' + to.name);
+      const frompath = path.join(TMP_FS_PATH, 'from');
+      const topath = path.join(TMP_FS_PATH, 'to');
+      const patchpath = path.join(TMP_FS_PATH, 'patch');
+      return exec("./bsdiff "+frompath+" "+topath+" "+patchpath).then(result => {
+        console.log(result);
+        res.status(200);
+        res.set('Cache-Control', 'max-age=' + Math.min(from.ttl, to.ttl));
+        res.set('Content-Type', 'application/octet-stream');
+        if (from.surrogateKey || to.surrogateKey) {
+          res.set('Surrogate-Key', from.surrogateKey + ' ' + to.surrogateKey);
+        }
+        console.log("Sending patch file...");
+        res.sendFile(patchpath);
+      });
     })
 
     // In error cases, just redirect so the client downloads the destination file in full

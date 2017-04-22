@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "node test/server.js",
-    "deploy": "gcloud beta functions deploy compareURLs --stage-bucket rd---product-abetts-cfunc --trigger-http"
+    "deploy": "./tasks/deploy.sh"
   },
   "dependencies": {
     "child-process-promise": "^2.2.1",
