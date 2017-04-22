@@ -19,6 +19,6 @@ Fastly is a CDN, but with our Edge Cloud tools and technologies it's possible to
 
 If you don't want to deploy the function to GCF to test it, you can also run a local server that makes it accessible on your machine
 
-## Rebuilding bsdiff
+## Rebuilding bsdiff
 
 A precompiled binary of `bsdiff` is included in this repo, but if it does not work on your machine you can also install it using homebrew or [download the source](http://www.daemonology.net/bsdiff/) (at time of writing the package has a number of problems, which are documented with fixes [here](http://www.cnblogs.com/lping/p/5833090.html) - albeit in Chinese)
