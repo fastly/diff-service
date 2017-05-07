@@ -7,9 +7,8 @@ backend be_diff_service {
   .ssl_cert_hostname = "us-central1-rd---product.cloudfunctions.net";
   .ssl = true;
   .probe = {
-    .timeout = 10s;
-    .interval = 10s;
     .request = "GET /healthcheck HTTP/1.1" "Host: us-central1-rd---product.cloudfunctions.net" "Connection: close" "User-Agent: Fastly healthcheck";
+    .dummy = true;
   }
 }
 
@@ -20,6 +19,7 @@ backend be_registry {
   .ssl = false;
   .probe = {
     .request = "GET / HTTP/1.1" "Host: registry.npmjs.org" "Connection: close" "User-Agent: Fastly healthcheck";
+    .dummy = true;
   }
 }
 
