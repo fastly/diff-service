@@ -62,7 +62,8 @@ exports.compareURLs = function compareURLs (req, res) {
       const frompath = path.join(TMP_FS_PATH, 'from');
       const topath = path.join(TMP_FS_PATH, 'to');
       const patchpath = path.join(TMP_FS_PATH, 'patch');
-      return exec("./bsdiff "+frompath+" "+topath+" "+patchpath).then(result => {
+      const cmd = "./bsdiff-gcp "+frompath+" "+topath+" "+patchpath;
+      return exec(cmd).then(result => {
         console.log(result);
         res.status(200);
         res.set('Cache-Control', 'max-age=' + Math.min(from.ttl, to.ttl));
